@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, Users } from 'lucide-react';
+import { LogOut, Users, Plus } from 'lucide-react';
+import AddUserModal from '@/components/AddUserModal';
+import CategoryManagement from '@/components/CategoryManagement';
 
 const dummyUsers = [
   { id: 1, name: 'John Smith', email: 'john.smith@example.com', role: 'User', status: 'Active' },
@@ -26,6 +28,7 @@ const dummyUsers = [
 const Dashboard = () => {
   const { isAuthenticated, adminEmail, logout } = useAuth();
   const navigate = useNavigate();
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -61,6 +64,18 @@ const Dashboard = () => {
           </Button>
         </div>
 
+        {/* Add Users Section */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-foreground">Add Users</h2>
+          <Button
+            onClick={() => setIsAddUserModalOpen(true)}
+            className="bg-gradient-to-r from-primary to-purple-600 hover:opacity-90"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add User
+          </Button>
+        </div>
+
         {/* Stats Card */}
         <Card className="border-border/50 shadow-xl backdrop-blur-sm bg-card/95">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -70,16 +85,10 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Total Users</p>
                 <p className="text-3xl font-bold text-foreground">{dummyUsers.length}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Active</p>
-                <p className="text-3xl font-bold text-green-500">
-                  {dummyUsers.filter(u => u.status === 'Active').length}
-                </p>
               </div>
               <div className="space-y-1">
                 <p className="text-sm text-muted-foreground">Managers</p>
@@ -90,6 +99,9 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Category Management */}
+        <CategoryManagement />
 
         {/* Users Table */}
         <Card className="border-border/50 shadow-xl backdrop-blur-sm bg-card/95">
@@ -143,6 +155,8 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AddUserModal open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen} />
     </div>
   );
 };
