@@ -30,13 +30,22 @@ const Dashboard = () => {
   const { isAuthenticated, adminEmail, logout } = useAuth();
   const navigate = useNavigate();
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
-  const [userApprovals, setUserApprovals] = useState<Record<number, boolean>>(
-    dummyUsers.reduce((acc, user) => ({ ...acc, [user.id]: user.approved }), {})
+  const [userApprovals, setUserApprovals] = useState<Record<number, 'pending' | 'approved' | 'rejected'>>(
+    dummyUsers.reduce((acc, user) => ({ ...acc, [user.id]: user.approved ? 'approved' : 'pending' }), {})
   );
 
   const handleApprovalToggle = (userId: number) => {
-    setUserApprovals(prev => ({ ...prev, [userId]: !prev[userId] }));
+    setUserApprovals(prev => {
+      const currentState = prev[userId];
+      if (currentState === 'pending' || currentState === 'rejected') {
+        return { ...prev, [userId]: 'approved' };
+      } else {
+        return { ...prev, [userId]: 'rejected' };
+      }
+    });
   };
+
+  const filteredUsers = dummyUsers.filter(user => user.role === 'User');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -124,11 +133,11 @@ const Dashboard = () => {
                   <TableHead className="text-muted-foreground font-semibold">Email</TableHead>
                   <TableHead className="text-muted-foreground font-semibold">Role</TableHead>
                   <TableHead className="text-muted-foreground font-semibold">Status</TableHead>
-                  <TableHead className="text-muted-foreground font-semibold">Approved</TableHead>
+                  <TableHead className="text-muted-foreground font-semibold"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {dummyUsers.map((user) => (
+                {filteredUsers.map((user) => (
                   <TableRow 
                     key={user.id} 
                     className="border-border/50 hover:bg-secondary/50 transition-colors"
@@ -158,14 +167,32 @@ const Dashboard = () => {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Switch
-                        checked={userApprovals[user.id]}
-                        onCheckedChange={() => handleApprovalToggle(user.id)}
-                        className={userApprovals[user.id] 
-                          ? 'data-[state=checked]:bg-green-500' 
-                          : 'data-[state=unchecked]:bg-red-500'
-                        }
-                      />
+                      <div className="flex items-center gap-3">
+                        <Switch
+                          checked={userApprovals[user.id] === 'approved'}
+                          onCheckedChange={() => handleApprovalToggle(user.id)}
+                          className={
+                            userApprovals[user.id] === 'approved'
+                              ? 'data-[state=checked]:bg-green-500' 
+                              : 'data-[state=unchecked]:bg-red-500'
+                          }
+                        />
+                        <span
+                          className={
+                            userApprovals[user.id] === 'approved'
+                              ? 'text-green-400 font-medium'
+                              : userApprovals[user.id] === 'rejected'
+                              ? 'text-red-400 font-medium'
+                              : 'text-muted-foreground font-medium'
+                          }
+                        >
+                          {userApprovals[user.id] === 'approved'
+                            ? 'Approved'
+                            : userApprovals[user.id] === 'rejected'
+                            ? 'Rejected'
+                            : 'Pending'}
+                        </span>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
