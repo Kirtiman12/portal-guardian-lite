@@ -12,23 +12,31 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { LogOut, Users, Plus } from 'lucide-react';
 import AddUserModal from '@/components/AddUserModal';
 import CategoryManagement from '@/components/CategoryManagement';
 
 const dummyUsers = [
-  { id: 1, name: 'John Smith', email: 'john.smith@example.com', role: 'User', status: 'Active' },
-  { id: 2, name: 'Sarah Johnson', email: 'sarah.j@example.com', role: 'User', status: 'Active' },
-  { id: 3, name: 'Michael Chen', email: 'mchen@example.com', role: 'Manager', status: 'Active' },
-  { id: 4, name: 'Emily Davis', email: 'emily.d@example.com', role: 'User', status: 'Inactive' },
-  { id: 5, name: 'David Wilson', email: 'dwilson@example.com', role: 'Manager', status: 'Active' },
-  { id: 6, name: 'Lisa Anderson', email: 'l.anderson@example.com', role: 'User', status: 'Active' },
+  { id: 1, name: 'John Smith', email: 'john.smith@example.com', role: 'User', status: 'Active', approved: true },
+  { id: 2, name: 'Sarah Johnson', email: 'sarah.j@example.com', role: 'User', status: 'Active', approved: true },
+  { id: 3, name: 'Michael Chen', email: 'mchen@example.com', role: 'Manager', status: 'Active', approved: true },
+  { id: 4, name: 'Emily Davis', email: 'emily.d@example.com', role: 'User', status: 'Inactive', approved: false },
+  { id: 5, name: 'David Wilson', email: 'dwilson@example.com', role: 'Manager', status: 'Active', approved: true },
+  { id: 6, name: 'Lisa Anderson', email: 'l.anderson@example.com', role: 'User', status: 'Active', approved: false },
 ];
 
 const Dashboard = () => {
   const { isAuthenticated, adminEmail, logout } = useAuth();
   const navigate = useNavigate();
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [userApprovals, setUserApprovals] = useState<Record<number, boolean>>(
+    dummyUsers.reduce((acc, user) => ({ ...acc, [user.id]: user.approved }), {})
+  );
+
+  const handleApprovalToggle = (userId: number) => {
+    setUserApprovals(prev => ({ ...prev, [userId]: !prev[userId] }));
+  };
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -116,6 +124,7 @@ const Dashboard = () => {
                   <TableHead className="text-muted-foreground font-semibold">Email</TableHead>
                   <TableHead className="text-muted-foreground font-semibold">Role</TableHead>
                   <TableHead className="text-muted-foreground font-semibold">Status</TableHead>
+                  <TableHead className="text-muted-foreground font-semibold">Approved</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -147,6 +156,16 @@ const Dashboard = () => {
                       >
                         {user.status}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Switch
+                        checked={userApprovals[user.id]}
+                        onCheckedChange={() => handleApprovalToggle(user.id)}
+                        className={userApprovals[user.id] 
+                          ? 'data-[state=checked]:bg-green-500' 
+                          : 'data-[state=unchecked]:bg-red-500'
+                        }
+                      />
                     </TableCell>
                   </TableRow>
                 ))}
