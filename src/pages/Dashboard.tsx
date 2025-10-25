@@ -183,7 +183,7 @@ const Dashboard = () => {
                               ? 'text-green-400 font-medium'
                               : userApprovals[user.id] === 'rejected'
                               ? 'text-red-400 font-medium'
-                              : 'text-muted-foreground font-medium'
+                              : 'text-gray-400 font-medium'
                           }
                         >
                           {userApprovals[user.id] === 'approved'
