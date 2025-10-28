@@ -14,9 +14,10 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
-import { LogOut, Users, Plus, Search } from 'lucide-react';
+import { LogOut, Users, Plus, Search, Receipt } from 'lucide-react';
 import AddUserModal from '@/components/AddUserModal';
 import CategoryManagement from '@/components/CategoryManagement';
+import ExpenseManagement from '@/components/ExpenseManagement';
 
 const dummyUsers = [
   { id: 1, name: 'John Smith', email: 'john.smith@example.com', employeeCode: 'EMP001', role: 'User', status: 'Active', approved: true },
@@ -31,6 +32,7 @@ const Dashboard = () => {
   const { isAuthenticated, adminEmail, logout } = useAuth();
   const navigate = useNavigate();
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [showExpenses, setShowExpenses] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [userApprovals, setUserApprovals] = useState<Record<number, 'pending' | 'approved' | 'rejected'>>(
     dummyUsers.reduce((acc, user) => ({ ...acc, [user.id]: user.approved ? 'approved' : 'pending' }), {})
@@ -90,14 +92,28 @@ const Dashboard = () => {
 
         {/* Add Users Section */}
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-foreground">Add Users</h2>
-          <Button
-            onClick={() => setIsAddUserModalOpen(true)}
-            className="bg-gradient-to-r from-primary to-purple-600 hover:opacity-90"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Add User
-          </Button>
+          <h2 className="text-2xl font-semibold text-foreground">
+            {showExpenses ? 'User Expenses' : 'Add Users'}
+          </h2>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => setShowExpenses(!showExpenses)}
+              variant="outline"
+              className="border-border/50 hover:border-primary transition-all duration-300"
+            >
+              <Receipt className="w-4 h-4 mr-2" />
+              {showExpenses ? 'Back to Users' : 'Check Expenses'}
+            </Button>
+            {!showExpenses && (
+              <Button
+                onClick={() => setIsAddUserModalOpen(true)}
+                className="bg-gradient-to-r from-primary to-purple-600 hover:opacity-90"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Add User
+              </Button>
+            )}
+          </div>
         </div>
 
         {/* Stats Card */}
@@ -125,10 +141,13 @@ const Dashboard = () => {
         </Card>
 
         {/* Category Management */}
-        <CategoryManagement />
+        {!showExpenses && <CategoryManagement />}
 
-        {/* Users Table */}
-        <Card className="border-border/50 shadow-xl backdrop-blur-sm bg-card/95">
+        {/* Conditional Content */}
+        {showExpenses ? (
+          <ExpenseManagement />
+        ) : (
+          <Card className="border-border/50 shadow-xl backdrop-blur-sm bg-card/95">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="text-xl font-semibold">Users</CardTitle>
@@ -220,6 +239,7 @@ const Dashboard = () => {
             </Table>
           </CardContent>
         </Card>
+        )}
       </div>
 
       <AddUserModal open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen} />
