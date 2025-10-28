@@ -13,23 +13,25 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { LogOut, Users, Plus } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { LogOut, Users, Plus, Search } from 'lucide-react';
 import AddUserModal from '@/components/AddUserModal';
 import CategoryManagement from '@/components/CategoryManagement';
 
 const dummyUsers = [
-  { id: 1, name: 'John Smith', email: 'john.smith@example.com', role: 'User', status: 'Active', approved: true },
-  { id: 2, name: 'Sarah Johnson', email: 'sarah.j@example.com', role: 'User', status: 'Active', approved: true },
-  { id: 3, name: 'Michael Chen', email: 'mchen@example.com', role: 'Manager', status: 'Active', approved: true },
-  { id: 4, name: 'Emily Davis', email: 'emily.d@example.com', role: 'User', status: 'Inactive', approved: false },
-  { id: 5, name: 'David Wilson', email: 'dwilson@example.com', role: 'Manager', status: 'Active', approved: true },
-  { id: 6, name: 'Lisa Anderson', email: 'l.anderson@example.com', role: 'User', status: 'Active', approved: false },
+  { id: 1, name: 'John Smith', email: 'john.smith@example.com', employeeCode: 'EMP001', role: 'User', status: 'Active', approved: true },
+  { id: 2, name: 'Sarah Johnson', email: 'sarah.j@example.com', employeeCode: 'EMP002', role: 'User', status: 'Active', approved: true },
+  { id: 3, name: 'Michael Chen', email: 'mchen@example.com', employeeCode: 'EMP003', role: 'Manager', status: 'Active', approved: true },
+  { id: 4, name: 'Emily Davis', email: 'emily.d@example.com', employeeCode: 'EMP004', role: 'User', status: 'Inactive', approved: false },
+  { id: 5, name: 'David Wilson', email: 'dwilson@example.com', employeeCode: 'EMP005', role: 'Manager', status: 'Active', approved: true },
+  { id: 6, name: 'Lisa Anderson', email: 'l.anderson@example.com', employeeCode: 'EMP006', role: 'User', status: 'Active', approved: false },
 ];
 
 const Dashboard = () => {
   const { isAuthenticated, adminEmail, logout } = useAuth();
   const navigate = useNavigate();
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [userApprovals, setUserApprovals] = useState<Record<number, 'pending' | 'approved' | 'rejected'>>(
     dummyUsers.reduce((acc, user) => ({ ...acc, [user.id]: user.approved ? 'approved' : 'pending' }), {})
   );
@@ -45,7 +47,12 @@ const Dashboard = () => {
     });
   };
 
-  const filteredUsers = dummyUsers.filter(user => user.role === 'User');
+  const filteredUsers = dummyUsers
+    .filter(user => user.role === 'User')
+    .filter(user => 
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -123,12 +130,24 @@ const Dashboard = () => {
         {/* Users Table */}
         <Card className="border-border/50 shadow-xl backdrop-blur-sm bg-card/95">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">Users</CardTitle>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl font-semibold">Users</CardTitle>
+              <div className="relative w-80">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search by name or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow className="border-border/50 hover:bg-secondary/50">
+                  <TableHead className="text-muted-foreground font-semibold">Employee Code</TableHead>
                   <TableHead className="text-muted-foreground font-semibold">Name</TableHead>
                   <TableHead className="text-muted-foreground font-semibold">Email</TableHead>
                   <TableHead className="text-muted-foreground font-semibold">Role</TableHead>
@@ -142,6 +161,7 @@ const Dashboard = () => {
                     key={user.id} 
                     className="border-border/50 hover:bg-secondary/50 transition-colors"
                   >
+                    <TableCell className="font-mono text-sm text-muted-foreground">{user.employeeCode}</TableCell>
                     <TableCell className="font-medium text-foreground">{user.name}</TableCell>
                     <TableCell className="text-muted-foreground">{user.email}</TableCell>
                     <TableCell>
