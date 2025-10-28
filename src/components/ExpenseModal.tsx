@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -5,6 +6,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 interface Expense {
   id: number;
@@ -20,10 +25,30 @@ interface ExpenseModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   expense: Expense | null;
+  onApprove?: (expenseId: number, approvedAmount: number, note: string) => void;
 }
 
-const ExpenseModal = ({ open, onOpenChange, expense }: ExpenseModalProps) => {
+const ExpenseModal = ({ open, onOpenChange, expense, onApprove }: ExpenseModalProps) => {
+  const [approvalAmount, setApprovalAmount] = useState('');
+  const [note, setNote] = useState('');
+
   if (!expense) return null;
+
+  const isPending = expense.status === 'pending';
+  const approvedAmt = expense.approvedAmount || 0;
+  const rejectedAmt = expense.status === 'approved' && expense.approvedAmount !== undefined 
+    ? expense.amount - expense.approvedAmount 
+    : 0;
+
+  const handleApprove = () => {
+    const amount = parseFloat(approvalAmount);
+    if (!isNaN(amount) && amount > 0 && onApprove) {
+      onApprove(expense.id, amount, note);
+      setApprovalAmount('');
+      setNote('');
+      onOpenChange(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -49,10 +74,18 @@ const ExpenseModal = ({ open, onOpenChange, expense }: ExpenseModalProps) => {
           </div>
 
           {expense.status === 'approved' && expense.approvedAmount !== undefined && (
-            <div>
-              <p className="text-sm text-muted-foreground">Approved Amount</p>
-              <p className="text-xl font-semibold text-green-400">₹{expense.approvedAmount.toLocaleString()}</p>
-            </div>
+            <>
+              <div>
+                <p className="text-sm text-muted-foreground">Approved Amount</p>
+                <p className="text-xl font-semibold text-green-400">₹{expense.approvedAmount.toLocaleString()}</p>
+              </div>
+              {rejectedAmt > 0 && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Rejected Amount</p>
+                  <p className="text-xl font-semibold text-red-400">₹{rejectedAmt.toLocaleString()}</p>
+                </div>
+              )}
+            </>
           )}
 
           <div>
@@ -69,12 +102,45 @@ const ExpenseModal = ({ open, onOpenChange, expense }: ExpenseModalProps) => {
                   ? 'bg-green-500/20 text-green-400 border-green-500/30' 
                   : expense.status === 'rejected'
                   ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                  : 'bg-muted text-muted-foreground'
+                  : 'bg-muted text-gray-400'
               }
             >
               {expense.status.charAt(0).toUpperCase() + expense.status.slice(1)}
             </Badge>
           </div>
+
+          {isPending && (
+            <div className="space-y-4 pt-4 border-t">
+              <div>
+                <Label htmlFor="approvalAmount">Approval Amount</Label>
+                <Input
+                  id="approvalAmount"
+                  type="number"
+                  placeholder="Enter amount to approve"
+                  value={approvalAmount}
+                  onChange={(e) => setApprovalAmount(e.target.value)}
+                  max={expense.amount}
+                />
+              </div>
+              <div>
+                <Label htmlFor="note">Admin Note</Label>
+                <Textarea
+                  id="note"
+                  placeholder="Add a note (optional)"
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={3}
+                />
+              </div>
+              <Button 
+                onClick={handleApprove} 
+                className="w-full"
+                disabled={!approvalAmount || parseFloat(approvalAmount) <= 0}
+              >
+                Approve Amount
+              </Button>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

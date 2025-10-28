@@ -8,64 +8,40 @@ import ExpenseModal from './ExpenseModal';
 
 interface Expense {
   id: number;
+  userId: number;
   category: string;
   amount: number;
   date: string;
   description: string;
   status: 'pending' | 'approved' | 'rejected';
   approvedAmount?: number;
+  note?: string;
 }
 
-interface UserExpenses {
+interface UserInfo {
   userId: number;
   name: string;
   email: string;
   employeeCode: string;
-  expenses: Expense[];
 }
 
-const dummyExpenses: UserExpenses[] = [
-  {
-    userId: 1,
-    name: 'John Smith',
-    email: 'john.smith@example.com',
-    employeeCode: 'EMP001',
-    expenses: [
-      { id: 1, category: 'Travel', amount: 5000, date: '2024-01-15', description: 'Client meeting in Mumbai', status: 'approved', approvedAmount: 4500 },
-      { id: 2, category: 'Food', amount: 1200, date: '2024-01-20', description: 'Team lunch', status: 'approved', approvedAmount: 1200 },
-      { id: 3, category: 'Office Supplies', amount: 800, date: '2024-01-22', description: 'Stationery items', status: 'pending' },
-    ]
-  },
-  {
-    userId: 2,
-    name: 'Sarah Johnson',
-    email: 'sarah.j@example.com',
-    employeeCode: 'EMP002',
-    expenses: [
-      { id: 4, category: 'Travel', amount: 3000, date: '2024-01-18', description: 'Conference attendance', status: 'approved', approvedAmount: 3000 },
-      { id: 5, category: 'Software', amount: 2500, date: '2024-01-25', description: 'Annual software license', status: 'rejected' },
-    ]
-  },
-  {
-    userId: 4,
-    name: 'Emily Davis',
-    email: 'emily.d@example.com',
-    employeeCode: 'EMP004',
-    expenses: [
-      { id: 6, category: 'Training', amount: 10000, date: '2024-01-10', description: 'Professional certification course', status: 'approved', approvedAmount: 8000 },
-      { id: 7, category: 'Travel', amount: 4000, date: '2024-01-28', description: 'Business trip', status: 'pending' },
-      { id: 8, category: 'Food', amount: 600, date: '2024-01-29', description: 'Client dinner', status: 'pending' },
-    ]
-  },
-  {
-    userId: 6,
-    name: 'Lisa Anderson',
-    email: 'l.anderson@example.com',
-    employeeCode: 'EMP006',
-    expenses: [
-      { id: 9, category: 'Office Supplies', amount: 1500, date: '2024-01-12', description: 'Desk equipment', status: 'approved', approvedAmount: 1500 },
-    ]
-  }
+const userInfo: UserInfo[] = [
+  { userId: 1, name: 'John Smith', email: 'john.smith@example.com', employeeCode: 'EMP001' },
+  { userId: 2, name: 'Sarah Johnson', email: 'sarah.j@example.com', employeeCode: 'EMP002' },
+  { userId: 4, name: 'Emily Davis', email: 'emily.d@example.com', employeeCode: 'EMP004' },
+  { userId: 6, name: 'Lisa Anderson', email: 'l.anderson@example.com', employeeCode: 'EMP006' },
+];
+
+const initialExpenses: Expense[] = [
+  { id: 1, userId: 1, category: 'Travel', amount: 5000, date: '2024-01-15', description: 'Client meeting in Mumbai', status: 'approved', approvedAmount: 4500 },
+  { id: 2, userId: 1, category: 'Food', amount: 1200, date: '2024-01-20', description: 'Team lunch', status: 'approved', approvedAmount: 1200 },
+  { id: 3, userId: 1, category: 'Office Supplies', amount: 800, date: '2024-01-22', description: 'Stationery items', status: 'pending' },
+  { id: 4, userId: 2, category: 'Travel', amount: 3000, date: '2024-01-18', description: 'Conference attendance', status: 'approved', approvedAmount: 3000 },
+  { id: 5, userId: 2, category: 'Software', amount: 2500, date: '2024-01-25', description: 'Annual software license', status: 'rejected' },
+  { id: 6, userId: 4, category: 'Training', amount: 10000, date: '2024-01-10', description: 'Professional certification course', status: 'approved', approvedAmount: 8000 },
+  { id: 7, userId: 4, category: 'Travel', amount: 4000, date: '2024-01-28', description: 'Business trip', status: 'pending' },
+  { id: 8, userId: 4, category: 'Food', amount: 600, date: '2024-01-29', description: 'Client dinner', status: 'pending' },
+  { id: 9, userId: 6, category: 'Office Supplies', amount: 1500, date: '2024-01-12', description: 'Desk equipment', status: 'approved', approvedAmount: 1500 },
 ];
 
 const ExpenseManagement = () => {
@@ -73,6 +49,7 @@ const ExpenseManagement = () => {
   const [expandedUsers, setExpandedUsers] = useState<Set<number>>(new Set());
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
+  const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
 
   const toggleUserExpanded = (userId: number) => {
     setExpandedUsers(prev => {
@@ -91,18 +68,35 @@ const ExpenseManagement = () => {
     setIsExpenseModalOpen(true);
   };
 
-  const calculateTotals = (expenses: Expense[]) => {
-    const total = expenses.reduce((sum, exp) => sum + exp.amount, 0);
-    const approved = expenses
+  const handleApproveExpense = (expenseId: number, approvedAmount: number, note: string) => {
+    setExpenses(prevExpenses =>
+      prevExpenses.map(exp =>
+        exp.id === expenseId
+          ? { ...exp, status: 'approved' as const, approvedAmount, note }
+          : exp
+      )
+    );
+  };
+
+  const getUserExpenses = (userId: number) => {
+    return expenses.filter(exp => exp.userId === userId);
+  };
+
+  const calculateTotals = (userExpenses: Expense[]) => {
+    const total = userExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+    const approved = userExpenses
       .filter(exp => exp.status === 'approved')
-      .reduce((sum, exp) => sum + (exp.approvedAmount || exp.amount), 0);
-    const rejected = expenses
+      .reduce((sum, exp) => sum + (exp.approvedAmount || 0), 0);
+    const rejected = userExpenses
+      .filter(exp => exp.status === 'approved' && exp.approvedAmount !== undefined && exp.approvedAmount < exp.amount)
+      .reduce((sum, exp) => sum + (exp.amount - (exp.approvedAmount || 0)), 0) +
+      userExpenses
       .filter(exp => exp.status === 'rejected')
       .reduce((sum, exp) => sum + exp.amount, 0);
     return { total, approved, rejected };
   };
 
-  const filteredUsers = dummyExpenses.filter(user =>
+  const filteredUsers = userInfo.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.employeeCode.toLowerCase().includes(searchTerm.toLowerCase())
@@ -128,7 +122,8 @@ const ExpenseManagement = () => {
         <CardContent>
           <div className="space-y-4">
             {filteredUsers.map((user) => {
-              const { total, approved, rejected } = calculateTotals(user.expenses);
+              const userExpenses = getUserExpenses(user.userId);
+              const { total, approved, rejected } = calculateTotals(userExpenses);
               const isExpanded = expandedUsers.has(user.userId);
 
               return (
@@ -173,7 +168,7 @@ const ExpenseManagement = () => {
                     {isExpanded && (
                       <div className="space-y-2 mt-4">
                         <h4 className="text-sm font-semibold text-muted-foreground">Individual Expenses</h4>
-                        {user.expenses.map((expense) => (
+                        {userExpenses.map((expense) => (
                           <div
                             key={expense.id}
                             className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:bg-secondary/50 transition-colors"
@@ -183,13 +178,13 @@ const ExpenseManagement = () => {
                                 <p className="font-medium text-foreground">{expense.category}</p>
                                 <Badge 
                                   variant={expense.status === 'approved' ? 'default' : expense.status === 'rejected' ? 'destructive' : 'secondary'}
-                                  className={
-                                    expense.status === 'approved' 
-                                      ? 'bg-green-500/20 text-green-400 border-green-500/30' 
-                                      : expense.status === 'rejected'
-                                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                                      : 'bg-muted text-muted-foreground'
-                                  }
+                                   className={
+                                     expense.status === 'approved' 
+                                       ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+                                       : expense.status === 'rejected'
+                                       ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                                       : 'bg-muted text-gray-400'
+                                   }
                                 >
                                   {expense.status}
                                 </Badge>
@@ -221,6 +216,7 @@ const ExpenseManagement = () => {
         open={isExpenseModalOpen}
         onOpenChange={setIsExpenseModalOpen}
         expense={selectedExpense}
+        onApprove={handleApproveExpense}
       />
     </>
   );
