@@ -26,9 +26,10 @@ interface ExpenseModalProps {
   onOpenChange: (open: boolean) => void;
   expense: Expense | null;
   onApprove?: (expenseId: number, approvedAmount: number, note: string) => void;
+  onReject?: (expenseId: number, note: string) => void;
 }
 
-const ExpenseModal = ({ open, onOpenChange, expense, onApprove }: ExpenseModalProps) => {
+const ExpenseModal = ({ open, onOpenChange, expense, onApprove, onReject }: ExpenseModalProps) => {
   const [approvalAmount, setApprovalAmount] = useState('');
   const [note, setNote] = useState('');
 
@@ -44,6 +45,15 @@ const ExpenseModal = ({ open, onOpenChange, expense, onApprove }: ExpenseModalPr
     const amount = parseFloat(approvalAmount);
     if (!isNaN(amount) && amount > 0 && onApprove) {
       onApprove(expense.id, amount, note);
+      setApprovalAmount('');
+      setNote('');
+      onOpenChange(false);
+    }
+  };
+
+  const handleReject = () => {
+    if (onReject) {
+      onReject(expense.id, note);
       setApprovalAmount('');
       setNote('');
       onOpenChange(false);
@@ -132,13 +142,22 @@ const ExpenseModal = ({ open, onOpenChange, expense, onApprove }: ExpenseModalPr
                   rows={3}
                 />
               </div>
-              <Button 
-                onClick={handleApprove} 
-                className="w-full"
-                disabled={!approvalAmount || parseFloat(approvalAmount) <= 0}
-              >
-                Approve Amount
-              </Button>
+              <div className="space-y-2">
+                <Button 
+                  onClick={handleApprove} 
+                  className="w-full"
+                  disabled={!approvalAmount || parseFloat(approvalAmount) <= 0}
+                >
+                  Approve Amount
+                </Button>
+                <Button 
+                  onClick={handleReject} 
+                  variant="destructive"
+                  className="w-full"
+                >
+                  Reject Expense
+                </Button>
+              </div>
             </div>
           )}
         </div>

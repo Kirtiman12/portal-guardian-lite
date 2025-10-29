@@ -78,6 +78,16 @@ const ExpenseManagement = () => {
     );
   };
 
+  const handleRejectExpense = (expenseId: number, note: string) => {
+    setExpenses(prevExpenses =>
+      prevExpenses.map(exp =>
+        exp.id === expenseId
+          ? { ...exp, status: 'rejected' as const, approvedAmount: 0, note }
+          : exp
+      )
+    );
+  };
+
   const getUserExpenses = (userId: number) => {
     return expenses.filter(exp => exp.userId === userId);
   };
@@ -217,6 +227,7 @@ const ExpenseManagement = () => {
         onOpenChange={setIsExpenseModalOpen}
         expense={selectedExpense}
         onApprove={handleApproveExpense}
+        onReject={handleRejectExpense}
       />
     </>
   );
