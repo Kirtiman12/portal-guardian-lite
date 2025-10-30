@@ -14,7 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
-import { LogOut, Users, Plus, Search, Receipt } from 'lucide-react';
+import { LogOut, Users, Plus, Search, Receipt, UserCircle } from 'lucide-react';
 import AddUserModal from '@/components/AddUserModal';
 import CategoryManagement from '@/components/CategoryManagement';
 import ExpenseManagement from '@/components/ExpenseManagement';
@@ -81,12 +81,12 @@ const Dashboard = () => {
             <p className="text-muted-foreground">Manage your users and monitor activity</p>
           </div>
           <Button 
-            onClick={logout}
+            onClick={() => navigate('/profile')}
             variant="outline"
             className="border-border/50 hover:border-primary transition-all duration-300"
           >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
+            <UserCircle className="w-4 h-4 mr-2" />
+            My Profile
           </Button>
         </div>
 
