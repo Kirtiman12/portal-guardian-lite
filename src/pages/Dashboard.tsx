@@ -19,6 +19,7 @@ import AddUserModal from '@/components/AddUserModal';
 import EditUserModal from '@/components/EditUserModal';
 import CategoryManagement from '@/components/CategoryManagement';
 import ExpenseManagement from '@/components/ExpenseManagement';
+import AnnualExpenseChart from '@/components/AnnualExpenseChart';
 
 const dummyUsers = [
   { id: 1, name: 'John Smith', email: 'john.smith@example.com', employeeCode: 'EMP001', role: 'User', status: 'Active', approved: true },
@@ -147,6 +148,9 @@ const Dashboard = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Annual Expense Chart */}
+        {!showExpenses && <AnnualExpenseChart />}
 
         {/* Category Management */}
         {!showExpenses && <CategoryManagement />}
