@@ -14,8 +14,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
-import { LogOut, Users, Plus, Search, Receipt, UserCircle } from 'lucide-react';
+import { LogOut, Users, Plus, Search, Receipt, UserCircle, Pencil } from 'lucide-react';
 import AddUserModal from '@/components/AddUserModal';
+import EditUserModal from '@/components/EditUserModal';
 import CategoryManagement from '@/components/CategoryManagement';
 import ExpenseManagement from '@/components/ExpenseManagement';
 
@@ -32,6 +33,8 @@ const Dashboard = () => {
   const { isAuthenticated, adminEmail, logout } = useAuth();
   const navigate = useNavigate();
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [isEditUserModalOpen, setIsEditUserModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<typeof dummyUsers[0] | null>(null);
   const [showExpenses, setShowExpenses] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [userApprovals, setUserApprovals] = useState<Record<number, 'pending' | 'approved' | 'rejected'>>(
@@ -47,6 +50,11 @@ const Dashboard = () => {
         return { ...prev, [userId]: 'rejected' };
       }
     });
+  };
+
+  const handleEditUser = (user: typeof dummyUsers[0]) => {
+    setSelectedUser(user);
+    setIsEditUserModalOpen(true);
   };
 
   const filteredUsers = dummyUsers
@@ -171,7 +179,8 @@ const Dashboard = () => {
                   <TableHead className="text-muted-foreground font-semibold">Email</TableHead>
                   <TableHead className="text-muted-foreground font-semibold">Role</TableHead>
                   <TableHead className="text-muted-foreground font-semibold">Status</TableHead>
-                  <TableHead className="text-muted-foreground font-semibold"></TableHead>
+                  <TableHead className="text-muted-foreground font-semibold">Approval</TableHead>
+                  <TableHead className="text-muted-foreground font-semibold">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -233,6 +242,17 @@ const Dashboard = () => {
                         </span>
                       </div>
                     </TableCell>
+                    <TableCell>
+                      <Button
+                        onClick={() => handleEditUser(user)}
+                        variant="ghost"
+                        size="sm"
+                        className="hover:bg-primary/10"
+                      >
+                        <Pencil className="w-4 h-4 mr-2" />
+                        Edit User
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -243,6 +263,7 @@ const Dashboard = () => {
       </div>
 
       <AddUserModal open={isAddUserModalOpen} onOpenChange={setIsAddUserModalOpen} />
+      <EditUserModal open={isEditUserModalOpen} onOpenChange={setIsEditUserModalOpen} user={selectedUser} />
     </div>
   );
 };
