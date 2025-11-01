@@ -1,8 +1,10 @@
 import { ResponsiveBar } from '@nivo/bar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TrendingUp } from 'lucide-react';
+import { useState } from 'react';
 
-const monthlyExpenseData = [
+const permanentEmployeeData = [
   { month: 'Jan', approved: 45000, rejected: 8000, total: 53000 },
   { month: 'Feb', approved: 52000, rejected: 12000, total: 64000 },
   { month: 'Mar', approved: 48000, rejected: 9000, total: 57000 },
@@ -17,14 +19,43 @@ const monthlyExpenseData = [
   { month: 'Dec', approved: 62000, rejected: 10500, total: 72500 },
 ];
 
+const contractualEmployeeData = [
+  { month: 'Jan', approved: 35000, rejected: 6000, total: 41000 },
+  { month: 'Feb', approved: 38000, rejected: 7000, total: 45000 },
+  { month: 'Mar', approved: 40000, rejected: 5500, total: 45500 },
+  { month: 'Apr', approved: 42000, rejected: 8000, total: 50000 },
+  { month: 'May', approved: 39000, rejected: 6500, total: 45500 },
+  { month: 'Jun', approved: 41000, rejected: 7500, total: 48500 },
+  { month: 'Jul', approved: 44000, rejected: 9000, total: 53000 },
+  { month: 'Aug', approved: 40000, rejected: 8500, total: 48500 },
+  { month: 'Sep', approved: 43000, rejected: 7000, total: 50000 },
+  { month: 'Oct', approved: 38000, rejected: 6000, total: 44000 },
+  { month: 'Nov', approved: 42000, rejected: 8000, total: 50000 },
+  { month: 'Dec', approved: 45000, rejected: 7500, total: 52500 },
+];
+
 const AnnualExpenseChart = () => {
+  const [employeeType, setEmployeeType] = useState<'permanent' | 'contractual'>('permanent');
+  
+  const monthlyExpenseData = employeeType === 'permanent' ? permanentEmployeeData : contractualEmployeeData;
   return (
     <Card className="border-border/50 shadow-xl backdrop-blur-sm bg-card/95">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-        <CardTitle className="text-xl font-semibold">Annual Expense Overview</CardTitle>
-        <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center shadow-glow">
-          <TrendingUp className="w-6 h-6 text-primary-foreground" />
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center shadow-glow">
+            <TrendingUp className="w-6 h-6 text-primary-foreground" />
+          </div>
+          <CardTitle className="text-xl font-semibold">Annual Expense Chart</CardTitle>
         </div>
+        <Select value={employeeType} onValueChange={(value: 'permanent' | 'contractual') => setEmployeeType(value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select employee type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="permanent">Permanent</SelectItem>
+            <SelectItem value="contractual">Contractual</SelectItem>
+          </SelectContent>
+        </Select>
       </CardHeader>
       <CardContent>
         <div style={{ height: '400px' }}>
@@ -32,7 +63,6 @@ const AnnualExpenseChart = () => {
             data={monthlyExpenseData}
             keys={['approved', 'rejected', 'total']}
             indexBy="month"
-            layout="horizontal"
             margin={{ top: 20, right: 130, bottom: 50, left: 60 }}
             padding={0.3}
             groupMode="grouped"
@@ -50,7 +80,7 @@ const AnnualExpenseChart = () => {
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 0,
-              legend: 'Amount (₹)',
+              legend: 'Month',
               legendPosition: 'middle',
               legendOffset: 40,
             }}
@@ -58,7 +88,7 @@ const AnnualExpenseChart = () => {
               tickSize: 5,
               tickPadding: 5,
               tickRotation: 0,
-              legend: 'Month',
+              legend: 'Amount (₹)',
               legendPosition: 'middle',
               legendOffset: -50,
             }}
