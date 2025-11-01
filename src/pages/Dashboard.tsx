@@ -20,6 +20,7 @@ import EditUserModal from '@/components/EditUserModal';
 import CategoryManagement from '@/components/CategoryManagement';
 import ExpenseManagement from '@/components/ExpenseManagement';
 import AnnualExpenseChart from '@/components/AnnualExpenseChart';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const dummyUsers = [
   { id: 1, name: 'John Smith', email: 'john.smith@example.com', employeeCode: 'EMP001', role: 'User', status: 'Active', approved: true },
@@ -89,14 +90,17 @@ const Dashboard = () => {
             </h1>
             <p className="text-muted-foreground">Manage your users and monitor activity</p>
           </div>
-          <Button 
-            onClick={() => navigate('/profile')}
-            variant="outline"
-            className="border-border/50 hover:border-primary transition-all duration-300"
-          >
-            <UserCircle className="w-4 h-4 mr-2" />
-            My Profile
-          </Button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Button 
+              onClick={() => navigate('/profile')}
+              variant="outline"
+              className="border-border/50 hover:border-primary transition-all duration-300"
+            >
+              <UserCircle className="w-4 h-4 mr-2" />
+              My Profile
+            </Button>
+          </div>
         </div>
 
         {/* Add Users Section */}
