@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Search, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Eye, ChevronDown, ChevronUp, Pencil } from 'lucide-react';
 import ExpenseModal from './ExpenseModal';
 
 interface Expense {
@@ -25,6 +25,10 @@ interface UserInfo {
   employeeCode: string;
 }
 
+interface ExpenseManagementProps {
+  onEditUser?: (user: { id: number; name: string; email: string; employeeCode: string; role: string; status: string; approved: boolean }) => void;
+}
+
 const userInfo: UserInfo[] = [
   { userId: 1, name: 'John Smith', email: 'john.smith@example.com', employeeCode: 'EMP001' },
   { userId: 2, name: 'Sarah Johnson', email: 'sarah.j@example.com', employeeCode: 'EMP002' },
@@ -44,7 +48,7 @@ const initialExpenses: Expense[] = [
   { id: 9, userId: 6, category: 'Office Supplies', amount: 1500, date: '2024-01-12', description: 'Desk equipment', status: 'approved', approvedAmount: 1500 },
 ];
 
-const ExpenseManagement = () => {
+const ExpenseManagement = ({ onEditUser }: ExpenseManagementProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedUsers, setExpandedUsers] = useState<Set<number>>(new Set());
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
@@ -149,14 +153,34 @@ const ExpenseManagement = () => {
                         </div>
                         <p className="text-sm text-muted-foreground">{user.email}</p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleUserExpanded(user.userId)}
-                        className="ml-4"
-                      >
-                        {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        {onEditUser && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => onEditUser({ 
+                              id: user.userId, 
+                              name: user.name, 
+                              email: user.email, 
+                              employeeCode: user.employeeCode,
+                              role: 'User',
+                              status: 'Active',
+                              approved: true
+                            })}
+                            className="hover:bg-primary/10"
+                          >
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Edit User
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleUserExpanded(user.userId)}
+                        >
+                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-3">

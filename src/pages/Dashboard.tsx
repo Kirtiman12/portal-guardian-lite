@@ -153,7 +153,7 @@ const Dashboard = () => {
 
         {/* Conditional Content */}
         {showExpenses ? (
-          <ExpenseManagement />
+          <ExpenseManagement onEditUser={handleEditUser} />
         ) : (
           <Card className="border-border/50 shadow-xl backdrop-blur-sm bg-card/95">
           <CardHeader>
