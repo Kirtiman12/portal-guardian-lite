@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Calendar, FolderKanban } from 'lucide-react';
+import { Calendar, FolderKanban, ArrowRight } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -11,23 +10,12 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-const ViewListsCard = () => {
-  const [activeView, setActiveView] = useState<'yearly' | 'project' | null>(null);
+interface ViewListsCardProps {
+  activeView: 'yearly' | 'project' | null;
+  setActiveView: (view: 'yearly' | 'project' | null) => void;
+}
 
-  // Dummy data - replace with real data
-  const yearlyData = [
-    { year: '2024', amount: 125000 },
-    { year: '2023', amount: 98000 },
-    { year: '2022', amount: 87000 },
-  ];
-
-  const projectData = [
-    { project: 'Website Redesign', amount: 45000 },
-    { project: 'Mobile App Development', amount: 38000 },
-    { project: 'Marketing Campaign', amount: 22000 },
-    { project: 'Infrastructure Upgrade', amount: 20000 },
-  ];
-
+const ViewListsCard = ({ activeView, setActiveView }: ViewListsCardProps) => {
   return (
     <Card className="border-border/50 shadow-lg backdrop-blur-sm bg-card/95">
       <CardHeader>
@@ -52,48 +40,6 @@ const ViewListsCard = () => {
             Check Project Wise
           </Button>
         </div>
-
-        {activeView === 'yearly' && (
-          <div className="border border-border/50 rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border/50 hover:bg-secondary/50">
-                  <TableHead className="text-muted-foreground font-semibold">Year</TableHead>
-                  <TableHead className="text-muted-foreground font-semibold text-right">Amount Spent</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {yearlyData.map((item) => (
-                  <TableRow key={item.year} className="border-border/50 hover:bg-secondary/50">
-                    <TableCell className="font-medium">{item.year}</TableCell>
-                    <TableCell className="text-right font-semibold">${item.amount.toLocaleString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-
-        {activeView === 'project' && (
-          <div className="border border-border/50 rounded-lg overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border/50 hover:bg-secondary/50">
-                  <TableHead className="text-muted-foreground font-semibold">Project</TableHead>
-                  <TableHead className="text-muted-foreground font-semibold text-right">Amount Spent</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {projectData.map((item) => (
-                  <TableRow key={item.project} className="border-border/50 hover:bg-secondary/50">
-                    <TableCell className="font-medium">{item.project}</TableCell>
-                    <TableCell className="text-right font-semibold">${item.amount.toLocaleString()}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

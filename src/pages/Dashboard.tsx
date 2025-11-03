@@ -23,6 +23,7 @@ import AnnualExpenseChart from '@/components/AnnualExpenseChart';
 import ThemeToggle from '@/components/ThemeToggle';
 import ExpenseStatsCards from '@/components/ExpenseStatsCards';
 import ViewListsCard from '@/components/ViewListsCard';
+import ExpenseListView from '@/components/ExpenseListView';
 
 const dummyUsers = [
   { id: 1, name: 'John Smith', email: 'john.smith@example.com', employeeCode: 'EMP001', role: 'User', status: 'Active', approved: true },
@@ -44,6 +45,7 @@ const Dashboard = () => {
   const [userApprovals, setUserApprovals] = useState<Record<number, 'pending' | 'approved' | 'rejected'>>(
     dummyUsers.reduce((acc, user) => ({ ...acc, [user.id]: user.approved ? 'approved' : 'pending' }), {})
   );
+  const [activeListView, setActiveListView] = useState<'yearly' | 'project' | null>(null);
 
   const handleApprovalToggle = (userId: number) => {
     setUserApprovals(prev => {
@@ -136,8 +138,11 @@ const Dashboard = () => {
           <div className="lg:col-span-2">
             <ExpenseStatsCards />
           </div>
-          <ViewListsCard />
+          <ViewListsCard activeView={activeListView} setActiveView={setActiveListView} />
         </div>
+
+        {/* Expense List View */}
+        {activeListView && <ExpenseListView type={activeListView} />}
 
         {/* Stats Card */}
         <Card className="border-border/50 shadow-xl backdrop-blur-sm bg-card/95">
