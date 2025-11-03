@@ -21,6 +21,8 @@ import CategoryManagement from '@/components/CategoryManagement';
 import ExpenseManagement from '@/components/ExpenseManagement';
 import AnnualExpenseChart from '@/components/AnnualExpenseChart';
 import ThemeToggle from '@/components/ThemeToggle';
+import ExpenseStatsCards from '@/components/ExpenseStatsCards';
+import ViewListsCard from '@/components/ViewListsCard';
 
 const dummyUsers = [
   { id: 1, name: 'John Smith', email: 'john.smith@example.com', employeeCode: 'EMP001', role: 'User', status: 'Active', approved: true },
@@ -127,6 +129,14 @@ const Dashboard = () => {
               </Button>
             )}
           </div>
+        </div>
+
+        {/* Expense Stats and View Lists */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <ExpenseStatsCards />
+          </div>
+          <ViewListsCard />
         </div>
 
         {/* Stats Card */}
