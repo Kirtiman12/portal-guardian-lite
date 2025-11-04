@@ -24,6 +24,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import ExpenseStatsCards from '@/components/ExpenseStatsCards';
 import ViewListsCard from '@/components/ViewListsCard';
 import ExpenseListView from '@/components/ExpenseListView';
+import PendingRequestsBar from '@/components/PendingRequestsBar';
 
 const dummyUsers = [
   { id: 1, name: 'John Smith', email: 'john.smith@example.com', employeeCode: 'EMP001', role: 'User', status: 'Active', approved: true },
@@ -132,6 +133,15 @@ const Dashboard = () => {
             )}
           </div>
         </div>
+
+        {/* Pending Requests Bar */}
+        {!showExpenses && (
+          <PendingRequestsBar
+            pendingUsers={dummyUsers.filter(user => userApprovals[user.id] === 'pending')}
+            onApprove={(userId) => handleApprovalToggle(userId)}
+            onReject={(userId) => handleApprovalToggle(userId)}
+          />
+        )}
 
         {/* Expense Stats and View Lists */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
